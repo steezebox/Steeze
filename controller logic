@@ -1,0 +1,28 @@
+const { db } = require('../config/firebase');
+const Video = require('../models/videoModel');
+
+exports.uploadVideo = async (req, res) => {
+  const { title, creatorId, price, previewUrl, fullUrl, isPaid } = req.body;
+
+  if (price < 1 || price > 5) {
+    return res.status(400).json({ error: 'Price must be between ₦1 and ₦5' });
+  }
+
+  const video = new Video({ title, creatorId, price, previewUrl, fullUrl, isPaid });
+  await db.collection('videos').add(video);
+  res.status(201).json({ message: 'Video uploaded successfully', video });
+};
+
+exports.unlockVideo = async (req, res) => {
+  const { videoId, viewerId } = req.body;
+
+  // Simulate payment verification
+  const paymentVerified = true;
+
+  if (paymentVerified) {
+    await db.collection('videos').doc(videoId).update({ isPaid: true });
+    res.status(200).json({ message: 'Video unlocked', padlock: '🔓' });
+  } else {
+    res.status(403).json({ error: 'Payment failed', padlock: '🔒' });
+  }
+};
