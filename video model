@@ -1,0 +1,12 @@
+class Video {
+  constructor({ title, creatorId, price, previewUrl, fullUrl, isPaid }) {
+    this.title = title;
+    this.creatorId = creatorId;
+    this.price = price;
+    this.previewUrl = previewUrl;
+    this.fullUrl = fullUrl;
+    this.isPaid = isPaid;
+    this.createdAt = new Date();
+  }
+}
+module.exports = Video;
