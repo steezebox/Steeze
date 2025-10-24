@@ -56,3 +56,29 @@ exports.spendAurum = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.convertAurum = async (req, res) => {
+  const { creatorId, amount, bankDetails } = req.body;
+
+  try {
+    const walletRef = db.collection('wallets').doc(creatorId);
+    const walletDoc = await walletRef.get();
+
+    if (!walletDoc.exists) return res.status(404).json({ error: 'Wallet not found' });
+
+    const balance = walletDoc.data().aurumBalance;
+    if (balance < amount) return res.status(403).json({ error: 'Insufficient Aurum' });
+
+    // Subtract Aurum from wallet
+    await walletRef.update({
+      aurumBalance: admin.firestore.FieldValue.increment(-amount)
+    });
+
+    // Send NGN via Flutterwave (mocked for now)
+    // You’ll replace this with actual Flutterwave payout API
+    console.log(`Send ₦${amount} to ${bankDetails.accountNumber} (${bankDetails.bankName})`);
+
+    res.status(200).json({ message: `₦${amount} sent to creator`, aurumDeducted: amount });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
