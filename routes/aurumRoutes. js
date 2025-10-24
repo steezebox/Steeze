@@ -5,3 +5,5 @@ const { buyAurum } = require('../controllers/aurumController');
 router.post('/buy', buyAurum);
 
 module.exports = router;
+const { spendAurum } = require('../controllers/aurumController');
+router.post('/spend', spendAurum);
