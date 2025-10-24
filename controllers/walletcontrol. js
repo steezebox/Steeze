@@ -1,0 +1,26 @@
+const { db } = require('../config/firebase');
+
+exports.createWallet = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    await db.collection('wallets').doc(userId).set({ aurumBalance: 0 });
+    res.status(201).json({ message: 'Wallet created' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getWallet = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const walletDoc = await db.collection('wallets').doc(userId).get();
+    if (!walletDoc.exists) {
+      return res.status(404).json({ error: 'Wallet not found' });
+    }
+    res.status(200).json(walletDoc.data());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
