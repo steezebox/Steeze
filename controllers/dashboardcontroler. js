@@ -1,0 +1,32 @@
+const { db } = require('../config/firebase');
+
+exports.getDashboardOverview = async (req, res) => {
+  const { creatorId } = req.params;
+
+  try {
+    const walletDoc = await db.collection('wallets').doc(creatorId).get();
+    const wallet = walletDoc.exists ? walletDoc.data() : { aurumBalance: 0 };
+
+    const earningsSnapshot = await db.collection('earnings')
+      .where('creatorId', '==', creatorId)
+      .get();
+
+    const totalEarnings = earningsSnapshot.docs.reduce((sum, doc) => {
+      return sum + doc.data().amount;
+    }, 0);
+
+    const payoutSnapshot = await db.collection('payouts')
+      .where('creatorId', '==', creatorId)
+      .get();
+
+    const payouts = payoutSnapshot.docs.map(doc => doc.data());
+
+    res.status(200).json({
+      aurumBalance: wallet.aurumBalance,
+      totalEarnings,
+      payouts
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
