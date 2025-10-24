@@ -1,0 +1,7 @@
+const express = require('express');
+const router = express.Router();
+const { buyAurum } = require('../controllers/aurumController');
+
+router.post('/buy', buyAurum);
+
+module.exports = router;
